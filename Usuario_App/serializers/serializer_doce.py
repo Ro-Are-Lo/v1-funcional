@@ -8,7 +8,7 @@ class DocenteProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DocenteProfile
-        fields = ['id', 'user',  'apellido_materno', 'institucion', 'licenciatura']
+        fields = ['id', 'user',   'institucion', 'licenciatura']
 
     
     def create(self, validated_data):

@@ -55,10 +55,18 @@ class CustomUser(AbstractUser):
         
     ]
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES)
-    apellido_materno = models.CharField(max_length=100)
+    last_name2 = models.CharField(max_length=50, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
     def __str__(self):
-        return f"{self.email} - {self.user_type}- {self.apellido_materno}"
+        return f"{self.email} - {self.user_type} - {self.last_name2}"
+    
+"""
+definiremos aqui la tabla usuarios con n los campos que diceñe en la vbase dedatos la tabla usuarios
+
+
+
+
+"""

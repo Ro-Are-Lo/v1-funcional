@@ -3,6 +3,7 @@ from django.db import models
 from .models_user import CustomUser
 from django.core.exceptions import ValidationError
 
+import datetime
 
 def validate_edad(value):
     if value < 0 or value > 120:
@@ -14,13 +15,23 @@ GENERO_CHOICES = [
     ('O', 'Otro'),
 ]
 
+#años atraidos por impor datetime
+def obtener_lista_años():
+    return [(r, r) for r in range(1900, datetime.datetime.now().year + 1)]
 
 
 class EstudianteProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='estudiante_profile')
-    apellido_materno = models.CharField(max_length=100)
+   
     edad = models.PositiveIntegerField(validators=[validate_edad])
     genero = models.CharField(max_length=1, choices=GENERO_CHOICES, default='O')
+
+    ult_ano_es = models.PositiveIntegerField(choices= obtener_lista_años(),default=datetime.datetime.now().year)
+
+    carr_op_A = models.CharField(max_length=30, null=True)
+    carr_op_B = models.CharField(max_length=30, null=True)
+    carr_op_B = models.CharField(max_length=30, null=True)
+
 
     def __str__(self):
         return f"Estudiante: {self.apellido_materno}, {self.edad} "
