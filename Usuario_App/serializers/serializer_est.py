@@ -9,12 +9,12 @@ class EstudianteProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EstudianteProfile
-        fields = ['id', 'user' , 'edad','genero','ult_ano_es' ]
-
-    #trae los serializers de user y su modelo y lo crea como si fuera nuevo usuario
+        fields = ['id', 'user', 'edad', 'genero', 'ult_ano_es']
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
+        # Crear el usuario con los datos proporcionados
         user = CustomUser.objects.create_user(**user_data)
+        # Crear el perfil del estudiante asociado
         estudiante = EstudianteProfile.objects.create(user=user, **validated_data)
         return estudiante

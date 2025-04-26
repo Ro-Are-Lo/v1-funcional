@@ -65,8 +65,4 @@ class CustomUser(AbstractUser):
     
 """
 definiremos aqui la tabla usuarios con n los campos que diceñe en la vbase dedatos la tabla usuarios
-
-
-
-
 """
