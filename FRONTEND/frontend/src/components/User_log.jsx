@@ -11,8 +11,10 @@ export default function CrearUsuarioForm()  {
     username: '',
     email: '',
     password: '',
+    user_type: '',
     is_active: true,
     is_staff: false,
+
   });
 
   const handleChange = (e) => {
@@ -26,7 +28,7 @@ export default function CrearUsuarioForm()  {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createUse(formData);
+      await createUser(formData);
       alert(' Usuario creado con éxito');
       navigate('/usuario-creado');
     } catch (error) {
@@ -66,6 +68,20 @@ export default function CrearUsuarioForm()  {
           onChange={handleChange}
           required
         />
+
+        <select
+          name="user_type"
+          value={formData.user_type}
+          onChange={handleChange}
+          required
+          className="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          
+          <option value="Docente">Docente</option>
+          <option value="Estudiante">Estudiante</option>
+          
+        </select>
+
 
         <div className="flex items-center gap-2">
           <input

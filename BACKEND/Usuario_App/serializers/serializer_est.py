@@ -2,11 +2,19 @@ from rest_framework import serializers
 from Usuario_App.models.estudiantes import EstudianteProfile
 from Usuario_App.serializers.serializer_user import CustomUserSerializer
 
-
+from Usuario_App.models.models_user import CustomUser
 
 class EstudianteProfileSerializer(serializers.ModelSerializer):
-    user = CustomUserSerializer(read_only=True)
+    user = CustomUserSerializer()
 
     class Meta:
         model = EstudianteProfile
-        fields = ['id', 'user', 'nombre', 'apellido_paterno', 'apellido_materno', 'edad']
+        fields = ['id', 'user', 'edad', 'genero', 'ult_ano_es']
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        # Crear el usuario con los datos proporcionados
+        user = CustomUser.objects.create_user(**user_data)
+        # Crear el perfil del estudiante asociado
+        estudiante = EstudianteProfile.objects.create(user=user, **validated_data)
+        return estudiante

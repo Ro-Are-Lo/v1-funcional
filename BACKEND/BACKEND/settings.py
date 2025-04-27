@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'Usuario_App',
-    'Test_App',
+    
 ]
 # decir al Djangoq ue tengo un modelo de usuario personalizado
 AUTH_USER_MODEL = 'Usuario_App.CustomUser'
@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173' # Si usas localhost en otro puerto
