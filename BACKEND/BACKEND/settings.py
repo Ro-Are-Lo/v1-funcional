@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'Usuario_App',
-    
+    'Test_app'
 ]
 # decir al Djangoq ue tengo un modelo de usuario personalizado
 AUTH_USER_MODEL = 'Usuario_App.CustomUser'
