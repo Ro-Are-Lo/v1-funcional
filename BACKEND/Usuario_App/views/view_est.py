@@ -12,6 +12,10 @@ class EstudianteProfileListCreateView(generics.ListCreateAPIView):
         context['user_type'] = 'estudiante'  # Esto garantiza que el serializer sepa que es un estudiante
         return context
 
+
+    
+
+
     def perform_create(self, serializer):
         # Guardar el perfil del estudiante y asignar los valores correctos al usuario
         user_profile = serializer.save()

@@ -28,9 +28,9 @@ class EstudianteProfile(models.Model):
 
     ult_ano_es = models.PositiveIntegerField(choices= obtener_lista_años(),default=datetime.datetime.now().year)
 
-    carr_op_A = models.CharField(max_length=30, null=True)
-    carr_op_B = models.CharField(max_length=30, null=True)
-    carr_op_C = models.CharField(max_length=30, null=True)
+    carr_op_A = models.CharField(max_length=30, null=True, blank=True)
+    carr_op_B = models.CharField(max_length=30, null=True,blank=True)
+    carr_op_C = models.CharField(max_length=30, null=True,blank=True)
 
 
     def __str__(self):

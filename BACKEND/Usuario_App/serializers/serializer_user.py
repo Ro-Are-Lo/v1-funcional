@@ -7,8 +7,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['id', 'email', 'username', 'first_name', 'last_name', 'last_name2', 'password', 'user_type', 'is_active', 'is_staff', 'is_superuser']
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True},
+            'user_type': {'read_only': True},
+            'is_active': {'read_only': True},
+            'is_staff': {'read_only': True},
+            'is_superuser': {'read_only': True},
         }
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,3 +35,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         # Crear el usuario con los datos validados
         user = CustomUser.objects.create_user(**validated_data)
         return user
+    
+
+
+    

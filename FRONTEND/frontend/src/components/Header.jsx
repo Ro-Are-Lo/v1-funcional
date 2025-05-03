@@ -7,9 +7,12 @@ export default function Header() {
       <div className='container mx-auto flex justify-between items-center'>
         <Link to="/" className='text-4xl font-bold text-blue-950'> Test /x/</Link>
         <div>
-          <Link to="/usuario-creado" className='bg-green-600 text-white px-4 py-2 rounded-lg'>
+          <Link to="/crear-user" className='bg-green-600 text-white px-4 py-2 rounded-lg'>
             log in
           </Link>
+          <Link to="/login" className='bg-green-600 text-white px-4 py-2 rounded-lg'>
+            sig in 
+          </Link >
         </div>
       </div>
     </nav>

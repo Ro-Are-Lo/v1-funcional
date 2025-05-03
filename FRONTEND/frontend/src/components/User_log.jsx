@@ -8,12 +8,14 @@ export default function CrearUsuarioForm()  {
   const params = useParams()
 
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
+    username: '',
+    first_name: '',
+    last_name: '',
+    last_name2: '',
     password: '',
-    user_type: '',
-    is_active: true,
-    is_staff: false,
+    
+    
 
   });
 
@@ -30,12 +32,24 @@ export default function CrearUsuarioForm()  {
     try {
       await createUser(formData);
       alert(' Usuario creado con éxito');
-      navigate('/usuario-creado');
+      navigate('/admin');
     } catch (error) {
       console.error(' Error al crear usuario:', error);
       alert('Hubo un error al crear el usuario.');
     }
   };
+
+// "email": "admin3@hotmail.com",
+//     "username": "admin3",
+//     "first_name": "qw",
+//     "last_name": "qw",
+//     "last_name2": "qw",
+//     "user_type": "admin",
+//     "is_active": true,
+//     "is_staff": true,
+//     "is_superuser": true
+
+
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-md shadow-md mt-10">
@@ -44,7 +58,7 @@ export default function CrearUsuarioForm()  {
         <input
           type="text"
           name="username"
-          placeholder="Nombre de usuario"
+          placeholder="Nombre de Usuario"
           className="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           value={formData.username}
           onChange={handleChange}
@@ -56,6 +70,7 @@ export default function CrearUsuarioForm()  {
           name="email"
           placeholder="Correo electrónico"
           className="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={formData.email}
           onChange={handleChange}
           required
         />
@@ -65,45 +80,40 @@ export default function CrearUsuarioForm()  {
           name="password"
           placeholder="Contraseña"
           className="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={formData.password}
           onChange={handleChange}
           required
         />
 
-        <select
-          name="user_type"
-          value={formData.user_type}
+        
+        <input
+          type="text"
+          name="first_name"
+          placeholder="Nombre"
+          className="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={formData.first_name}
           onChange={handleChange}
           required
+        />
+         <input
+          type="text"
+          name="last_name"
+          placeholder="Apellido Paterno"
           className="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          
-          <option value="Docente">Docente</option>
-          <option value="Estudiante">Estudiante</option>
-          
-        </select>
+          value={formData.last_name}
+          onChange={handleChange}
+          required
+        />
+         <input
+          type="text"
+          name="last_name2"
+          placeholder="Apellido Materno"
+          className="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={formData.last_name2}
+          onChange={handleChange}
+          required
+        />
 
-
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="is_active"
-            checked={formData.is_active}
-            onChange={handleChange}
-            className="h-4 w-4 text-blue-600"
-          />
-          <label htmlFor="is_active">Usuario activo</label>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="is_staff"
-            checked={formData.is_staff}
-            onChange={handleChange}
-            className="h-4 w-4 text-blue-600"
-          />
-          <label htmlFor="is_staff">Es staff</label>
-        </div>
 
         <button
           type="submit"

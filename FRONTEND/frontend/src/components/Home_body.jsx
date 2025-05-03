@@ -20,11 +20,12 @@ export default function IniciarTest(){
           <div className="container mx-auto flex flex-col md:flex-row justify-between items-center px-4 gap-4">
             {/* Botón a la izquierda */}
             <Link
-              to="/usuario-est"
+              to="/test"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium text-lg"
             >
               Iniciar Test
             </Link>
+    
     
             {/* Imagen a la derecha */}
             <img

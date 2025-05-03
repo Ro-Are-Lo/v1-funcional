@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,12 +39,30 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'corsheaders',
     'Usuario_App',
-    'Test_app'
+    'Test_App',
 ]
 # decir al Djangoq ue tengo un modelo de usuario personalizado
 AUTH_USER_MODEL = 'Usuario_App.CustomUser'
+#jwt
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+#      'DEFAULT_PERMISSION_CLASSES': (
+#         'rest_framework.permissions.IsAuthenticated',
+#     ),
+}
+
+#autenticacion de JWT con limite de tiempo
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Duración del token de acceso
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     # Duración del token de actualización
+    'AUTH_HEADER_TYPES': ('Bearer',),                # Tipo de encabezado de autorización
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,9 +76,9 @@ MIDDLEWARE = [
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173' # Si usas localhost en otro puerto
-]
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:5173' # Si usas localhost en otro puerto
+# ]
 
 
 ROOT_URLCONF = 'BACKEND.urls'
