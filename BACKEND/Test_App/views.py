@@ -1,6 +1,8 @@
 import requests
 from rest_framework.response import Response
 from rest_framework import status
+
+from BACKEND.Usuario_App.models.estudiantes import EstudianteProfile
 from .models import Pregunta
 from rest_framework.views import APIView
 from .serializers import PreguntaSerializer
@@ -84,7 +86,7 @@ class EvaluarRespuestasView(APIView):
         }, status=200)
 
 
-    # def post(self, request, *args, **kwargs):
+    # def post(self, request, *args, **kwargs):                #PARA VER SI LOS CAMBIOS SE HICIERON BIEN 
     #     # Accede al usuario autenticado con request.user
     #     print("Usuario autenticado:", request.user)
     #     print("Token JWT:", request.auth)  # ← esto debería mostrar el token JWT
