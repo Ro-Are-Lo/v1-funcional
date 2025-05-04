@@ -8,6 +8,7 @@ export default function SelectorPreguntas() {
   const [resultado, setResultado] = useState(null);
   const [usuarioAutenticado, setUsuarioAutenticado] = useState(false);
   const [token, setToken] = useState(null);
+  const [resultadosPorMateria, setResultadosPorMateria] = useState({});
 
   const navigate = useNavigate();
 
@@ -68,50 +69,71 @@ export default function SelectorPreguntas() {
   };
 
   // Manejar el envío de respuestas
+  // Manejar el envío de respuestas
   const handleSubmit = async () => {
-    if (!materiaActiva) return;
+  if (!materiaActiva) return;
 
-    if (!usuarioAutenticado || !token) {
-      alert('Debes iniciar sesión para enviar tus respuestas.');
-      navigate('/login'); // Redirige al login si no está autenticado
-      return;
-    }
+  if (!usuarioAutenticado || !token) {
+    alert('Debes iniciar sesión para enviar tus respuestas.');
+    navigate('/login');
+    return;
+  }
 
-    const respuestasFiltradas = preguntasPorMateria[materiaActiva]
-      .filter((p) => respuestas[p.id])
-      .map((p) => ({
-        id: p.id,
-        respuesta: respuestas[p.id],
-      }));
-
-    const payload = {
-      materia: materiaActiva,
-      respuestas: respuestasFiltradas,
-    };
-
-    try {
-      const res = await fetch('http://127.0.0.1:8000/test/evaluar-respuestas/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setResultado(data);
-      } else {
-        console.error('Error al evaluar respuestas', data);
-        alert(`Error al evaluar las respuestas: ${data.error || 'Por favor intente nuevamente.'}`);
-      }
-    } catch (err) {
-      console.error('Error al enviar respuestas:', err);
-      alert('Ocurrió un error al enviar las respuestas. Inténtalo de nuevo.');
-    }
+  // Mapeo de letras a campos de opción
+  const letraAOpcion = {
+    A: 'opa',
+    B: 'opb',
+    C: 'opc',
+    D: 'opd'
   };
+
+  // Convertir las letras seleccionadas en respuestas reales (texto)
+  const respuestasFiltradas = preguntasPorMateria[materiaActiva]
+    .filter((p) => respuestas[p.id])
+    .map((p) => {
+      const letraSeleccionada = respuestas[p.id]; // A, B, C o D
+      const campoOpcion = letraAOpcion[letraSeleccionada];
+      const textoRespuesta = p[campoOpcion]; // valor tipo "base × altura", etc.
+
+      return {
+        id: p.id,
+        respuesta: textoRespuesta
+      };
+    });
+
+  const payload = {
+    materia: materiaActiva.toLowerCase(), // aseguramos que sea lowercase
+    respuestas: respuestasFiltradas
+  };
+
+  try {
+    const res = await fetch('http://127.0.0.1:8000/test/evaluar-respuestas/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    console.log('Respuesta del backend:', data);
+
+    if (res.ok) {
+      setResultadosPorMateria((prev) => ({
+        ...prev,
+        [materiaActiva]: data,
+      }));
+    } else {
+      console.error('Error al evaluar respuestas', data);
+      alert(`Error: ${data.error || 'Intenta de nuevo.'}`);
+    }
+  } catch (err) {
+    console.error('Error al enviar respuestas:', err);
+    alert('Ocurrió un error. Inténtalo de nuevo.');
+  }
+};
+
 
   return (
     <div className="max-w-4xl mx-auto mt-10 p-4 border rounded shadow-sm bg-white">
@@ -136,7 +158,7 @@ export default function SelectorPreguntas() {
             <div key={pregunta.id} className="mb-6">
               <p className="font-medium">{index + 1}. {pregunta.pregunta}</p>
               <div className="space-y-1 mt-2">
-                {["A", "B", "C"].map((opcion) => (
+                {["A", "B", "C","D"].map((opcion) => (
                   <label key={opcion} className="block">
                     <input
                       type="radio"
@@ -161,18 +183,61 @@ export default function SelectorPreguntas() {
         </div>
       )}
 
-      {resultado && resultado.recomendacion && (
-        <div className="mt-6 bg-green-100 p-4 rounded text-left">
-          <p className="font-semibold">Correctas: {resultado.correctas}</p>
-          <p className="font-semibold mt-2">Carreras recomendadas:</p>
-          <ul className="list-disc list-inside text-sm">
-            {resultado.recomendacion
-              .replace("Te recomendamos las siguientes carreras:", "")
-              .split(",")
-              .map((carrera, index) => (
-                <li key={index}>{carrera.trim()}</li>
+      {Object.entries(resultadosPorMateria).map(([materia, resultado]) => (
+        <div key={materia} className="mt-6 bg-green-100 p-4 rounded text-left shadow">
+          <p className="font-semibold text-green-800">📘 Materia: {materia}</p>
+          <p className="font-semibold text-green-800">✅ Correctas: {resultado.correctas}</p>
+          
+          {resultado.recomendacion && (
+          <div className="mt-3">
+            {resultado.recomendacion.includes("carreras:") ? (
+              <>
+                <p className="font-semibold text-green-800">🎓 Carreras recomendadas:</p>
+                <ul className="list-disc list-inside text-sm text-green-900 mt-2">
+                  {resultado.recomendacion
+                    .replace("Te recomendamos las siguientes carreras:", "")
+                    .split(",")
+                    .map((carrera, index) => (
+                      <li key={index}>{carrera.trim()}</li>
+                    ))}
+                </ul>
+              </>
+            ) : (
+              <p className="text-sm text-red-700 font-medium">{resultado.recomendacion}</p>
+            )}
+          </div>
+          )}
+
+
+
+
+        </div>
+      ))}
+
+      {Object.keys(resultadosPorMateria).length > 0 && (
+        <div className="mt-10 bg-blue-50 p-4 rounded shadow text-blue-900">
+          <h3 className="text-lg font-bold mb-2">📊 Resumen General del Test</h3>
+          <p><strong>Materias evaluadas:</strong> {Object.keys(resultadosPorMateria).length}</p>
+          <p>
+            <strong>Total de respuestas correctas:</strong>{" "}
+            {Object.values(resultadosPorMateria).reduce((sum, res) => sum + (res.correctas || 0), 0)}
+          </p>
+          <div className="mt-3">
+            <p className="font-semibold">🎓 Carreras sugeridas (sin repetir):</p>
+            <ul className="list-disc list-inside text-sm mt-1">
+              {[...new Set(
+                Object.values(resultadosPorMateria)
+                  .flatMap((res) =>
+                    res.recomendacion
+                      ?.replace("Te recomendamos las siguientes carreras:", "")
+                      .split(",")
+                      .map((c) => c.trim()) || []
+                  )
+              )].map((carrera, index) => (
+                <li key={index}>{carrera}</li>
               ))}
-          </ul>
+            </ul>
+          </div>
         </div>
       )}
     </div>
