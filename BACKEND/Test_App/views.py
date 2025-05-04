@@ -2,11 +2,13 @@ import requests
 from rest_framework.response import Response
 from rest_framework import status
 
-from BACKEND.Usuario_App.models.estudiantes import EstudianteProfile
+from Usuario_App.models.estudiantes import EstudianteProfile
 from .models import Pregunta
 from rest_framework.views import APIView
 from .serializers import PreguntaSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView 
+
 
 # Diccionario de materias clave y sus carreras asociadas
 MATERIA_CARRERAS = {
@@ -35,28 +37,44 @@ MATERIA_CARRERAS = {
     ]
 }
 
+def normalizar_materia(nombre_materia):
+    nombre_materia = nombre_materia.lower()
+    if "biología" in nombre_materia:
+        return "biologia"
+    elif "física" in nombre_materia:
+        return "fisica"
+    elif "química" in nombre_materia:
+        return "quimica"
+    elif "matemática" in nombre_materia or "matemáticas" in nombre_materia:
+        return "matematicas"
+    elif "lengua" in nombre_materia or "lenguaje" in nombre_materia or "inglés" in nombre_materia:
+        return "lenguaje"
+    elif "sociales" in nombre_materia or "historia" in nombre_materia or "geografía" in nombre_materia:
+        return "sociales"
+    else:
+        return None
+
+
 class EvaluarRespuestasView(APIView):
-    """
-    Recibe respuestas, las evalúa y devuelve la recomendación de carrera,
-    y envía esta recomendación a la app `usuarios`.
-    """
-    permission_classes = [IsAuthenticated]  # Asegura que el usuario esté autenticado
-    
-    
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
         respuestas = request.data.get('respuestas', [])
-        materia_general = request.data.get('materia', None)
+        materia_raw = request.data.get('materia', None)
 
-        if not respuestas or not materia_general:
+        if not respuestas or not materia_raw:
             return Response({"error": "Se deben enviar respuestas y materia."}, status=400)
 
-        materia_general = materia_general.lower()
+        materia_general = normalizar_materia(materia_raw)
+        if not materia_general:
+            return Response({"error": f"Materia '{materia_raw}' no es válida o no está mapeada."}, status=400)
+
         correctas = 0
 
         for respuesta in respuestas:
             try:
                 pregunta = Pregunta.objects.get(id=respuesta['id'])
-                if pregunta.materia.lower() != materia_general:
+                if normalizar_materia(pregunta.materia) != materia_general:
                     continue
                 if pregunta.opcorrecta == respuesta['respuesta']:
                     correctas += 1
@@ -64,13 +82,12 @@ class EvaluarRespuestasView(APIView):
                 return Response({"error": f"Pregunta con id {respuesta['id']} no encontrada."}, status=404)
 
         carreras_recomendadas = []
-        if correctas >= 2 and materia_general in MATERIA_CARRERAS:
+        if correctas >= 3 and materia_general in MATERIA_CARRERAS:
             carreras_recomendadas = MATERIA_CARRERAS[materia_general][:3]
             recomendacion = "Te recomendamos las siguientes carreras: " + ", ".join(carreras_recomendadas)
         else:
             recomendacion = "Te recomendamos repasar los temas o explorar carreras de humanidades."
 
-        # Guardar en el perfil del estudiante (sobrescribiendo si ya hay algo)
         try:
             perfil = EstudianteProfile.objects.get(user=request.user)
             perfil.carr_op_A = carreras_recomendadas[0] if len(carreras_recomendadas) > 0 else None

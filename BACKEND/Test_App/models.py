@@ -11,7 +11,7 @@ class Pregunta(models.Model):
     opa = models.CharField(max_length=255)
     opb = models.CharField(max_length=255)
     opc = models.CharField(max_length=255)
-    opd = models.CharField(max_length=255, blank= True)
+    opd = models.CharField(max_length=255,null= True, blank= True)
 
     opcorrecta = models.CharField(max_length=250)  # A, B o C
 
