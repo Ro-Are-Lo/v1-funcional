@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'Usuario_App',
     'Test_App',
@@ -62,6 +63,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Duración del token de acceso
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     # Duración del token de actualización
     'AUTH_HEADER_TYPES': ('Bearer',),                # Tipo de encabezado de autorización
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ROTATE_REFRESH_TOKENS': True,
 }
 
 MIDDLEWARE = [
@@ -74,11 +77,17 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
-CORS_ALLOW_ALL_ORIGINS = True
 
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:5173' # Si usas localhost en otro puerto
-# ]
+CORS_ALLOW_ALL_ORIGINS = False
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+]
+
 
 
 ROOT_URLCONF = 'BACKEND.urls'
@@ -111,6 +120,21 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'nombre_de_tu_base_de_datos',
+#         'USER': 'tu_usuario',
+#         'PASSWORD': 'tu_contraseña',
+#         'HOST': 'localhost',  # o dirección IP del servidor MySQL
+#         'PORT': '3306',       # puerto por defecto de MySQL
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#         }
+#     }
+# }
+
 
 
 # Password validation

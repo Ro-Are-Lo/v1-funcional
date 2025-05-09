@@ -11,6 +11,7 @@ import Home_user_doce from './pages/Home_user_doce';
 import Home_user_estu from './pages/Home_user_estu';
 import SelectorPreguntas from './components/SelectorPreguntas';
 import DocenteForm from './components/DocenteForm';
+import SeleccionRol from './components/SelectorUser';
 
 function App() {
   return (
@@ -33,6 +34,9 @@ function App() {
           <Route path="/estudiante" element={<Home_user_estu/>} />
 
           <Route path="/test" element={<SelectorPreguntas />} />
+
+
+          <Route path="/selector" element={<SeleccionRol />} />
 
           {/* Añade las demás rutas aquí */}
         </Routes>

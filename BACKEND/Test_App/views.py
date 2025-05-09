@@ -82,7 +82,7 @@ class EvaluarRespuestasView(APIView):
                 return Response({"error": f"Pregunta con id {respuesta['id']} no encontrada."}, status=404)
 
         carreras_recomendadas = []
-        if correctas >= 3 and materia_general in MATERIA_CARRERAS:
+        if correctas >= 6 and materia_general in MATERIA_CARRERAS:
             carreras_recomendadas = MATERIA_CARRERAS[materia_general][:3]
             recomendacion = "Te recomendamos las siguientes carreras: " + ", ".join(carreras_recomendadas)
         else:

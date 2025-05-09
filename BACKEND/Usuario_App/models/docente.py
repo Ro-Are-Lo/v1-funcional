@@ -6,7 +6,7 @@ class DocenteProfile(models.Model):
     
     institucion = models.CharField(max_length=255)
     licenciatura = models.CharField(max_length=255)
-
+    
     def __str__(self):
         return f"Docente: {self.institucion} {self.licenciatura}"
     
