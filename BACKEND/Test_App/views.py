@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -93,6 +94,10 @@ class EvaluarRespuestasView(APIView):
             perfil.carr_op_A = carreras_recomendadas[0] if len(carreras_recomendadas) > 0 else None
             perfil.carr_op_B = carreras_recomendadas[1] if len(carreras_recomendadas) > 1 else None
             perfil.carr_op_C = carreras_recomendadas[2] if len(carreras_recomendadas) > 2 else None
+
+             # Asignar la fecha de realización del test
+            perfil.fecha_realizacion = datetime.now()  # Establece la fecha y hora actual
+
             perfil.save()
         except EstudianteProfile.DoesNotExist:
             return Response({"error": "Perfil de estudiante no encontrado."}, status=404)

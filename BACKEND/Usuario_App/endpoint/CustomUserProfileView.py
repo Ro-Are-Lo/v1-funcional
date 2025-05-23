@@ -39,6 +39,45 @@ class CustomUserProfileView(APIView):
 
 
 
+    def put(self, request):
+        user = request.user
+        user_serializer = CustomUserSerializer(user, data=request.data.get('user'), partial=True)
+        
+        response_data = {}
+
+        if user_serializer.is_valid():
+            user_serializer.save()
+            response_data['user'] = user_serializer.data
+        else:
+            return Response(user_serializer.errors, status=400)
+
+        # Estudiante
+        try:
+            estudiante_profile = EstudianteProfile.objects.get(user=user)
+            estudiante_serializer = EstudianteProfileSerializer(estudiante_profile, data=request.data.get('estudiante_profile'), partial=True)
+            if estudiante_serializer.is_valid():
+                estudiante_serializer.save()
+                response_data['estudiante_profile'] = estudiante_serializer.data
+            else:
+                return Response(estudiante_serializer.errors, status=400)
+        except EstudianteProfile.DoesNotExist:
+            pass
+
+        # Docente
+        try:
+            docente_profile = DocenteProfile.objects.get(user=user)
+            docente_serializer = DocenteProfileSerializer(docente_profile, data=request.data.get('docente_profile'), partial=True)
+            if docente_serializer.is_valid():
+                docente_serializer.save()
+                response_data['docente_profile'] = docente_serializer.data
+            else:
+                return Response(docente_serializer.errors, status=400)
+        except DocenteProfile.DoesNotExist:
+            pass
+
+        return Response(response_data)
+
+
 
 
 # from rest_framework.views import APIView

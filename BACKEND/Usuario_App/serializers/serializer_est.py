@@ -9,7 +9,7 @@ class EstudianteProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EstudianteProfile
-        fields = ['id', 'user', 'edad', 'genero', 'ult_ano_es','carr_op_A','carr_op_B','carr_op_C']
+        fields = ['id', 'user', 'edad', 'genero', 'ult_ano_es','carr_op_A','carr_op_B','carr_op_C','fecha_realizacion']
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')

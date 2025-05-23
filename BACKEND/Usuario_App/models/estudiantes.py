@@ -32,7 +32,20 @@ class EstudianteProfile(models.Model):
     carr_op_B = models.CharField(max_length=30, null=True,blank=True)
     carr_op_C = models.CharField(max_length=30, null=True,blank=True)
 
-
-    def __str__(self):
-        return f"Estudiante: {self.genero}, {self.edad} , {self.carr_op_A} , {self.carr_op_B}, {self.carr_op_C} , {self.ult_ano_es}"
+    # fecha de realizacion del test
+    fecha_realizacion = models.DateTimeField(null=True, blank=True, default=None)
     
+    def __str__(self):
+        return f"Estudiante: {self.genero}, {self.edad} , {self.carr_op_A} , {self.carr_op_B}, {self.carr_op_C} , {self.ult_ano_es}, {self.fecha_realizacion}"
+    
+
+# class TestRealizado(models.Model):
+#     usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+#     materia = models.CharField(max_length=100)
+#     correctas = models.PositiveIntegerField()
+#     total_preguntas = models.PositiveIntegerField(default=10)
+#     aprobado = models.BooleanField()
+#     fecha_realizacion = models.DateTimeField(default=timezone.now)
+
+#     def __str__(self):
+#         return f"{self.usuario.username} - {self.materia} - {self.correctas}/{self.total_preguntas} - {'Aprobado' if self.aprobado else 'Reprobado'}"

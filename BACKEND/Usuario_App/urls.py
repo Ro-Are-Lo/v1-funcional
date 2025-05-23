@@ -31,7 +31,7 @@ urlpatterns = [
     path('usuarios/completos/', CustomUserProfileDetailViewCom.as_view(), name='usuarios/completos'),
     path('estudiantes/perfil/', EstudianteProfileDetailView.as_view(), name='perfil_estudiante'),
     path('usuarios/perfil/', CustomUserProfileView.as_view (), name='perfil_usuario'),
-    path('docentes/perfil/', DocenteProfileDetailView.as_view(), name='perfil_usuario'),
+    path('docentes/perfil/', DocenteProfileDetailView.as_view(), name='perfil_docente'),
     
     
     # path('api/guardar-respuestas/', GuardarRespuestasView.as_view(), name='guardar_respuestas'),

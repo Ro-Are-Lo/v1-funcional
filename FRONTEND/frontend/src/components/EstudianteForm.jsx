@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import  { useState,React } from 'react';
 import { useNavigate } from 'react-router';
 import { createUserEst } from '../Api/api';
+import axios from 'axios';
 
 const EstudianteForm = () => {
   const navigate = useNavigate();
@@ -17,7 +18,6 @@ const EstudianteForm = () => {
     ult_ano_es: '',  
   });
 
-  // Cambiar valores en el estado del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -26,27 +26,68 @@ const EstudianteForm = () => {
     }));
   };
 
-  // Manejar el envío del formulario
+// subri formulatio con lo datos
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const payload = {
-        user: {
-          email: formData.email,
-          username: formData.username,
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          last_name2: formData.last_name2,
-          password: formData.password,
-        },
-        edad: parseInt(formData.edad),
-        genero: formData.genero,
-        ult_ano_es: parseInt(formData.ult_ano_es),
-      };
+  e.preventDefault();
+  try {
+    // Preparar el payload con los campos correctos y sus valores
+    const payload = {
+      user: {
+        email: formData.email,
+        username: formData.username,  // Si el backend usa username, mantén este campo
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        last_name2: formData.last_name2,
+        password: formData.password,
+      },
+      edad: parseInt(formData.edad),
+      genero: formData.genero,
+      ult_ano_es: parseInt(formData.ult_ano_es),
+     // Si el campo es vacío, envíalo vacío (según lo que el backend espera)
+    };
 
-      await createUserEst(payload);  // Crear el estudiante usando la API
-      alert('Estudiante creado con éxito');
-      navigate('/estudiante'); // Redirigir a la lista de estudiantes
+    // Enviar la solicitud con Axios o la función que estés usando para la creación del estudiante
+    const response = await createUserEst(payload);
+
+    
+  // Función para hacer login después del registro
+  const loginAfterRegister = async (email, password) => {
+  console.log('Enviando login con:', email, password); // Depuración
+
+  try {
+    // Haciendo la solicitud POST al endpoint de login
+    const response = await axios.post('http://127.0.0.1:8000/login/api/token/', {
+      email,  // El correo electrónico del usuario
+      password, // La contraseña del usuario
+    });
+
+    console.log('Respuesta del login:', response.status, response.data); // Ver respuesta del servidor
+
+    // Verificar que la respuesta sea exitosa (código 200)
+    if (response.status === 200) {
+      const data = response.data;
+
+      // Guardar los tokens de acceso y refresh en el localStorage
+      localStorage.setItem('access', data.access);
+      localStorage.setItem('refresh', data.refresh);
+
+      console.log('Tokens almacenados en localStorage');
+    } else {
+      throw new Error('No se pudo obtener el token.');
+    }
+  } catch (error) {
+    console.error('Error al hacer login:', error);
+    alert('Error al hacer login tras el registro. Por favor, intenta nuevamente.');
+  }
+};
+
+    
+    // Si la respuesta es exitosa, realiza el login automáticamente
+    if (response.status === 201) {
+      await loginAfterRegister(formData.email, formData.password);  // Login con email
+
+      alert('Estudiante creado y autenticado con éxito');
+      navigate('/estudiante'); // Redirigir al home del estudiante
 
       // Limpiar el formulario
       setFormData({
@@ -60,11 +101,23 @@ const EstudianteForm = () => {
         genero: '',
         ult_ano_es: '',
       });
-    } catch (error) {
-      console.error('Error al crear estudiante:', error);
+    
+    } 
+    
+    else {
+      console.error('Error al crear el estudiante:', response.data);
       alert('Hubo un error al crear el estudiante.');
+      } 
     }
-  };
+     catch (error) {
+    console.error('Error al crear estudiante:', error);
+    alert('Hubo un error al crear o autenticar al estudiante.');
+  
+  }
+
+  
+};
+
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded shadow mt-10">
