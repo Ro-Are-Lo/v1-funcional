@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
+import axios from 'axios';
 import { createUserDoc } from '../Api/api';
 
 const DocenteForm = () => {
   const navigate = useNavigate();
 
-  // Estado para manejar los datos del formulario
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -17,7 +17,27 @@ const DocenteForm = () => {
     licenciatura: '',
   });
 
-  // Manejador de cambios en los campos del formulario
+  // 🔐 Función para hacer login tras registrar al docente
+  const loginAfterRegister = async (email, password) => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/login/api/token/', {
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        const data = response.data;
+        localStorage.setItem('access', data.access);
+        localStorage.setItem('refresh', data.refresh);
+      } else {
+        throw new Error('No se pudo obtener el token.');
+      }
+    } catch (error) {
+      console.error('Error al hacer login:', error);
+      throw error;
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -26,7 +46,6 @@ const DocenteForm = () => {
     }));
   };
 
-  // Manejador para el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -44,14 +63,14 @@ const DocenteForm = () => {
         licenciatura: formData.licenciatura,
       };
 
-      // Llamada a la API para crear el docente
       await createUserDoc(payload);
 
-      // Si todo va bien, mostrar un mensaje y redirigir
-      alert('Docente creado con éxito');
-      navigate('/docente');  // Redirige a la página de docentes
+      // 🔐 Login después de registro
+      await loginAfterRegister(formData.email, formData.password);
 
-      // Limpiar el formulario
+      alert('Docente creado y autenticado con éxito');
+      navigate('/docente');
+
       setFormData({
         email: '',
         username: '',
@@ -63,10 +82,9 @@ const DocenteForm = () => {
         licenciatura: '',
       });
     } catch (error) {
-      console.error('Error al crear docente:', error);
-
-      // Si ocurre un error, mostrar un mensaje
-      alert('Hubo un error al crear el docente.');
+      console.error('❌ Error al crear docente:', error);
+      console.error('❗ Detalle:', error.response?.data);
+      alert('Error al registrar o autenticar docente.');
     }
   };
 
@@ -77,7 +95,7 @@ const DocenteForm = () => {
         <input
           type="email"
           name="email"
-          placeholder="Correo Electronico"
+          placeholder="Correo Electrónico"
           value={formData.email}
           onChange={handleChange}
           className="border px-4 py-2 rounded"

@@ -1,11 +1,8 @@
-import  { useState,React } from 'react';
-import { useNavigate } from 'react-router';
-import { createUserEst } from '../Api/api';
+import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const EstudianteForm = () => {
-  const navigate = useNavigate();
-
+function EstudianteForm() {
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -15,131 +12,107 @@ const EstudianteForm = () => {
     password: '',
     edad: '',
     genero: '',
-    ult_ano_es: '',  
+    ult_ano_es: '',
   });
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const loginAfterRegister = async (email, password) => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/login/api/token/', {
+        email,
+        password,
+      });
+      if (response.status === 200) {
+        const data = response.data;
+        localStorage.setItem('access', data.access);
+        localStorage.setItem('refresh', data.refresh);
+      } else {
+        throw new Error('No se pudo obtener el token.');
+      }
+    } catch (error) {
+      console.error('Error al hacer login:', error);
+      throw error;
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
   };
 
-// subri formulatio con lo datos
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    // Preparar el payload con los campos correctos y sus valores
+    e.preventDefault();
+    setError(null);
+
     const payload = {
       user: {
         email: formData.email,
-        username: formData.username,  // Si el backend usa username, mantén este campo
+        username: formData.username,
+        password: formData.password,      // password justo después de username
         first_name: formData.first_name,
         last_name: formData.last_name,
         last_name2: formData.last_name2,
-        password: formData.password,
       },
-      edad: parseInt(formData.edad),
+      edad: formData.edad ? Number(formData.edad) : null,
       genero: formData.genero,
-      ult_ano_es: parseInt(formData.ult_ano_es),
-     // Si el campo es vacío, envíalo vacío (según lo que el backend espera)
+      ult_ano_es: formData.ult_ano_es ? Number(formData.ult_ano_es) : null,
     };
 
-    // Enviar la solicitud con Axios o la función que estés usando para la creación del estudiante
-    const response = await createUserEst(payload);
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/login/estudiantes/', payload);
 
-    
-  // Función para hacer login después del registro
-  const loginAfterRegister = async (email, password) => {
-  console.log('Enviando login con:', email, password); // Depuración
+      if (response.status === 201) {
+        await loginAfterRegister(formData.email, formData.password);
 
-  try {
-    // Haciendo la solicitud POST al endpoint de login
-    const response = await axios.post('http://127.0.0.1:8000/login/api/token/', {
-      email,  // El correo electrónico del usuario
-      password, // La contraseña del usuario
-    });
+        alert('Estudiante creado y autenticado con éxito');
+        navigate('/estudiante');
 
-    console.log('Respuesta del login:', response.status, response.data); // Ver respuesta del servidor
-
-    // Verificar que la respuesta sea exitosa (código 200)
-    if (response.status === 200) {
-      const data = response.data;
-
-      // Guardar los tokens de acceso y refresh en el localStorage
-      localStorage.setItem('access', data.access);
-      localStorage.setItem('refresh', data.refresh);
-
-      console.log('Tokens almacenados en localStorage');
-    } else {
-      throw new Error('No se pudo obtener el token.');
+        setFormData({
+          email: '',
+          username: '',
+          first_name: '',
+          last_name: '',
+          last_name2: '',
+          password: '',
+          edad: '',
+          genero: '',
+          ult_ano_es: '',
+        });
+      } else {
+        setError('Error al crear estudiante');
+      }
+    } catch (error) {
+      console.error('Error en el registro:', error);
+      setError(error.response?.data || 'Error inesperado');
     }
-  } catch (error) {
-    console.error('Error al hacer login:', error);
-    alert('Error al hacer login tras el registro. Por favor, intenta nuevamente.');
-  }
-};
-
-    
-    // Si la respuesta es exitosa, realiza el login automáticamente
-    if (response.status === 201) {
-      await loginAfterRegister(formData.email, formData.password);  // Login con email
-
-      alert('Estudiante creado y autenticado con éxito');
-      navigate('/estudiante'); // Redirigir al home del estudiante
-
-      // Limpiar el formulario
-      setFormData({
-        email: '',
-        username: '',
-        first_name: '',
-        last_name: '',
-        last_name2: '',
-        password: '',
-        edad: '',
-        genero: '',
-        ult_ano_es: '',
-      });
-    
-    } 
-    
-    else {
-      console.error('Error al crear el estudiante:', response.data);
-      alert('Hubo un error al crear el estudiante.');
-      } 
-    }
-     catch (error) {
-    console.error('Error al crear estudiante:', error);
-    alert('Hubo un error al crear o autenticar al estudiante.');
-  
-  }
-
-  
-};
-
+  };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded shadow mt-10">
-      <h2 className="text-2xl font-bold mb-4 text-center">Crear Estudiante</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
+      <h2 className="text-xl font-bold mb-4">Registrar Estudiante</h2>
+      {error && <p className="text-red-600 mb-4">{JSON.stringify(error)}</p>}
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="email"
           name="email"
-          placeholder="Correo Electrónico"
+          placeholder="Email"
           value={formData.email}
           onChange={handleChange}
-          className="border px-4 py-2 rounded"
           required
+          className="w-full p-2 border rounded"
         />
         <input
           type="text"
           name="username"
-          placeholder="Nombre de Usuario"
+          placeholder="Nombre de usuario"
           value={formData.username}
           onChange={handleChange}
-          className="border px-4 py-2 rounded"
           required
+          className="w-full p-2 border rounded"
         />
         <input
           type="password"
@@ -147,35 +120,34 @@ const EstudianteForm = () => {
           placeholder="Contraseña"
           value={formData.password}
           onChange={handleChange}
-          className="border px-4 py-2 rounded"
           required
+          className="w-full p-2 border rounded"
         />
         <input
           type="text"
           name="first_name"
-          placeholder="Nombre"
+          placeholder="Primer nombre"
           value={formData.first_name}
           onChange={handleChange}
-          className="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           required
+          className="w-full p-2 border rounded"
         />
         <input
           type="text"
           name="last_name"
-          placeholder="Apellido Paterno"
+          placeholder="Apellido paterno"
           value={formData.last_name}
           onChange={handleChange}
-          className="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           required
+          className="w-full p-2 border rounded"
         />
         <input
           type="text"
           name="last_name2"
-          placeholder="Apellido Materno"
+          placeholder="Apellido materno"
           value={formData.last_name2}
           onChange={handleChange}
-          className="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          required
+          className="w-full p-2 border rounded"
         />
         <input
           type="number"
@@ -183,43 +155,36 @@ const EstudianteForm = () => {
           placeholder="Edad"
           value={formData.edad}
           onChange={handleChange}
-          className="border px-4 py-2 rounded"
-          required
-          min="1"
-          max="120"
-        />
-        <input
-          type="number"
-          name="ult_ano_es"
-          placeholder="Año de Estudio"
-          value={formData.ult_ano_es}
-          onChange={handleChange}
-          className="border px-4 py-2 rounded"
-          required
-          min="1900"
-          max="9999"
+          className="w-full p-2 border rounded"
         />
         <select
           name="genero"
           value={formData.genero}
           onChange={handleChange}
-          className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-          required
+          className="w-full p-2 border rounded"
         >
-          <option value="">Selecciona un Género</option>
+          <option value="">Selecciona género</option>
           <option value="M">Masculino</option>
           <option value="F">Femenino</option>
           <option value="O">Otro</option>
         </select>
+        <input
+          type="number"
+          name="ult_ano_es"
+          placeholder="Último año escolar"
+          value={formData.ult_ano_es}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+        />
         <button
           type="submit"
-          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition"
         >
-          Crear Estudiante
+          Registrar
         </button>
       </form>
     </div>
   );
-};
+}
 
 export default EstudianteForm;
