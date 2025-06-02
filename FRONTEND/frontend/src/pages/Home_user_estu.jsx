@@ -94,28 +94,68 @@ function Home_user_estu() {
   if (error) return <div>Error: {error}</div>;
   if (!usuario) return <div>Cargando...</div>;
 
-  const PerfilView = () => (
-    <div>
-      <h3><strong>Nombre de Usuario:</strong> {formData.username}</h3>
-      <p><strong>Email:</strong> {formData.email}</p>
-      <p><strong>Primer Nombre:</strong> {formData.first_name}</p>
-      <p><strong>Apellido Paterno:</strong> {formData.last_name}</p>
-      <p><strong>Apellido Materno:</strong> {formData.last_name2}</p>
-      <p><strong>Edad:</strong> {formData.edad}</p>
-      <p><strong>Género:</strong> {formData.genero}</p>
-      <p><strong>Último Año Escolar:</strong> {formData.ult_ano_es}</p>
-      <p><strong>Carrera Opcional A:</strong> {formData.carr_op_A}</p>
-      <p><strong>Carrera Opcional B:</strong> {formData.carr_op_B}</p>
-      <p><strong>Carrera Opcional C:</strong> {formData.carr_op_C}</p>
+  // const PerfilView = () => (
+  //   <div>
+  //     <h3><strong>Nombre de Usuario:</strong> {formData.username}</h3>
+  //     <p><strong>Email:</strong> {formData.email}</p>
+  //     <p><strong>Primer Nombre:</strong> {formData.first_name}</p>
+  //     <p><strong>Apellido Paterno:</strong> {formData.last_name}</p>
+  //     <p><strong>Apellido Materno:</strong> {formData.last_name2}</p>
+  //     <p><strong>Edad:</strong> {formData.edad}</p>
+  //     <p><strong>Género:</strong> {formData.genero}</p>
+  //     <p><strong>Último Año Escolar:</strong> {formData.ult_ano_es}</p>
+  //     <p><strong>Carrera Opcional A:</strong> {formData.carr_op_A}</p>
+  //     <p><strong>Carrera Opcional B:</strong> {formData.carr_op_B}</p>
+  //     <p><strong>Carrera Opcional C:</strong> {formData.carr_op_C}</p>
 
-      <button 
-        onClick={() => setIsEditing(true)}
-        className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-      >
-        Editar Perfil
-      </button>
+  //     <button 
+  //       onClick={() => setIsEditing(true)}
+  //       className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+  //     >
+  //       Editar Perfil
+  //     </button>
+  //   </div>
+  // );
+
+  const PerfilView = () => (
+  <div>
+    <h3><strong>Nombre de Usuario:</strong> {formData.username}</h3>
+    <p><strong>Email:</strong> {formData.email}</p>
+    <p><strong>Primer Nombre:</strong> {formData.first_name}</p>
+    <p><strong>Apellido Paterno:</strong> {formData.last_name}</p>
+    <p><strong>Apellido Materno:</strong> {formData.last_name2}</p>
+    <p><strong>Edad:</strong> {formData.edad}</p>
+    <p><strong>Género:</strong> {formData.genero}</p>
+    <p><strong>Último Año Escolar:</strong> {formData.ult_ano_es}</p>
+    <p><strong>Carrera Opcional A:</strong> {formData.carr_op_A}</p>
+    <p><strong>Carrera Opcional B:</strong> {formData.carr_op_B}</p>
+    <p><strong>Carrera Opcional C:</strong> {formData.carr_op_C}</p>
+
+    {/* Mostrar Resultados de Materias */}
+    <div className="mt-6">
+      <h4 className="text-lg font-bold">Resultados por Materia</h4>
+      {usuario.resultados && usuario.resultados.length > 0 ? (
+        <ul className="list-disc ml-6 mt-2">
+          {usuario.resultados.map((resultado, index) => (
+            <li key={index}>
+              <strong>{resultado.materia}</strong>: {resultado.correctas} correctas — {resultado.nota_parcial}% nota parcial
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-2 text-gray-600">Aún no tienes resultados registrados.</p>
+      )}
     </div>
-  );
+
+    <button
+      onClick={() => setIsEditing(true)}
+      className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+    >
+      Editar Perfil
+    </button>
+  </div>
+);
+
 
   const PerfilEdit = () => (
     <form onSubmit={handleSubmit} className="space-y-4">
